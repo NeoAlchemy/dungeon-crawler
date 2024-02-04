@@ -14,6 +14,11 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "bat"
     },
+    "image4": {
+        "data": "hwQQABAAAAAAAAAAwAwAAAAAAAB8DAAAAAAAwHfG/wAAwPz/d2fGDwBsd2d/Z2b2wHd3d/ZmZsZsd3d3x8xmxnx3bMdnz2zBfHf2Z3z8ZsF8d2Z3fGcWwXx3Znd8dxHBbHf2dywSEcHAd2x3fxcRwQBsd/fAFxHGAMD8DwAcYQ8AAAAAAMD/AA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "snakeLeft"
+    },
     "anim1": {
         "namespace": "myAnimations",
         "id": "anim1",
