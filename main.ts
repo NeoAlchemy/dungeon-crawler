@@ -1,8 +1,3 @@
-namespace SpriteKind {
-    export const Bat = SpriteKind.create()
-    export const Ghost = SpriteKind.create()
-    export const Snake = SpriteKind.create()
-}
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     doWalkForward()
 })
@@ -111,6 +106,7 @@ function doWalkForward () {
 }
 function setupDude (col: number, row: number) {
     dude = sprites.create(assets.image`hero`, SpriteKind.Player)
+    dude.setScale(0.9, ScaleAnchor.Middle)
     tiles.placeOnTile(dude, tiles.getTileLocation(col, row))
     scene.cameraFollowSprite(dude)
     controller.moveSprite(dude)
@@ -205,6 +201,12 @@ function isHit (enemySprite: Sprite) {
     isEnemyBelow = 0
     isEnemyLeft = 0
     isEnemyRight = 0
+    console.log("")
+    console.log("-----------")
+    console.logValue("dude top", dude.top)
+    console.logValue("dude right", dude.right)
+    console.logValue("enemy bottom", enemySprite.bottom)
+    console.logValue("enemy left", enemySprite.left)
     if (dude.top >= enemySprite.bottom - marginOfError && dude.top <= enemySprite.bottom + marginOfError) {
         isEnemyAbove = 1
     }
@@ -217,17 +219,18 @@ function isHit (enemySprite: Sprite) {
     if (dude.right >= enemySprite.left - marginOfError && dude.right <= enemySprite.left + marginOfError) {
         isEnemyRight = 1
     }
+    console.log("-----------")
     console.logValue("top", isEnemyAbove)
     console.logValue("bottom", isEnemyBelow)
     console.logValue("left", isEnemyLeft)
     console.logValue("right", isEnemyRight)
     if (heroFacingPosition == 0) {
-        if (isEnemyAbove && (isEnemyLeft || isEnemyRight)) {
+        if (isEnemyAbove == 1 && (isEnemyRight == 1 || isEnemyLeft == 1)) {
             sprites.destroy(enemySprite, effects.fire, 100)
             info.changeScoreBy(100)
         }
     } else if (heroFacingPosition == 1) {
-        if (isEnemyBelow && (isEnemyLeft || isEnemyRight)) {
+        if (isEnemyBelow == 1 && (isEnemyRight == 1 || isEnemyLeft == 1)) {
             sprites.destroy(enemySprite, effects.fire, 100)
             info.changeScoreBy(100)
         }
@@ -247,8 +250,8 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     doWalkLeft()
 })
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.stairWest, function (sprite, location) {
+    tiles.placeOnTile(sprite, tiles.getTileLocation(location.column - 1, location.row))
     setupLevel1()
-    tiles.placeOnTile(sprite, location)
 })
 function doWalkRight () {
     animation.runImageAnimation(
@@ -341,13 +344,29 @@ function doEnemyFight (enemySprite: Sprite) {
 }
 function doFallback () {
     if (heroFacingPosition == 0) {
-        dude.y += 16
+        if (tiles.tileAtLocationIsWall(tiles.getTileLocation(dude.tilemapLocation().column + 0, dude.tilemapLocation().row + 1))) {
+        	
+        } else {
+            dude.y += 16
+        }
     } else if (heroFacingPosition == 1) {
-        dude.y += -16
+        if (tiles.tileAtLocationIsWall(tiles.getTileLocation(dude.tilemapLocation().column - 0, dude.tilemapLocation().row - 1))) {
+        	
+        } else {
+            dude.y += -16
+        }
     } else if (heroFacingPosition == 2) {
-        dude.x += 16
+        if (tiles.tileAtLocationIsWall(tiles.getTileLocation(dude.tilemapLocation().column + 1, dude.tilemapLocation().row + 0))) {
+        	
+        } else {
+            dude.x += 16
+        }
     } else {
-        dude.x += -16
+        if (tiles.tileAtLocationIsWall(tiles.getTileLocation(dude.tilemapLocation().column - 1, dude.tilemapLocation().row + 0))) {
+        	
+        } else {
+            dude.x += -16
+        }
     }
 }
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sprite, location) {
@@ -381,10 +400,8 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     doWalkRight()
 })
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.stairEast, function (sprite, location) {
-    tiles.setCurrentTilemap(tilemap`level0`)
-    tiles.placeOnTile(sprite, location)
-    levelState = 2
-    doEnemyUpAndDown(assets.image`bat`, 13, 4, sprites.create(assets.image`bat`, SpriteKind.Bat))
+    tiles.placeOnTile(sprite, tiles.getTileLocation(location.column + 1, location.row))
+    setupLevel2()
 })
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
     doEnemyFight(sprite)
@@ -484,7 +501,14 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
     info.changeScoreBy(50)
     sprites.destroy(otherSprite)
 })
+function setupLevel2 () {
+    sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
+    tiles.setCurrentTilemap(tilemap`level0`)
+    levelState = 2
+    doEnemyUpAndDown(assets.image`bat`, 13, 4, sprites.create(assets.image`bat`, SpriteKind.Enemy))
+}
 function setupLevel1 () {
+    sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
     tiles.setCurrentTilemap(tilemap`level1`)
     levelState = 1
     enemyBackAndForth(img`
@@ -1033,8 +1057,8 @@ function doAttack () {
         isHit(value)
     }
 }
-let ghost: Sprite = null
 let levelState = 0
+let ghost: Sprite = null
 let bat: Sprite = null
 let isEnemyRight = 0
 let isEnemyLeft = 0
