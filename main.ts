@@ -1,5 +1,17 @@
+namespace SpriteKind {
+    export const Ball = SpriteKind.create()
+}
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     doWalkForward()
+})
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.stairNorth, function (sprite, location) {
+    tiles.placeOnTile(sprite, tiles.getTileLocation(location.column, location.row + 2))
+    setupLevel3()
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Ball, function (sprite, otherSprite) {
+    info.changeScoreBy(200)
+    game.gameOver(true)
+    game.setGameOverEffect(true, effects.splatter)
 })
 function setHeart (col: number, row: number) {
     heart = sprites.create(img`
@@ -267,6 +279,11 @@ scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.stairWest, function (spri
     tiles.placeOnTile(sprite, tiles.getTileLocation(location.column - 1, location.row))
     setupLevel1()
 })
+function setupLevel0 () {
+    sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
+    tiles.setCurrentTilemap(tilemap`level16`)
+    levelState = 0
+}
 function doWalkRight () {
     animation.runImageAnimation(
     dude,
@@ -404,7 +421,7 @@ scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sp
             . b b . . . . . . . . . . b b . 
             `)
         info.changeScoreBy(50)
-        music.play(music.melodyPlayable(music.baDing), music.PlaybackMode.UntilDone)
+        music.play(music.melodyPlayable(music.baDing), music.PlaybackMode.InBackground)
     }
 })
 scene.onHitWall(SpriteKind.Enemy, function (sprite, location) {
@@ -514,6 +531,10 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
     info.changeLifeBy(1)
     info.changeScoreBy(50)
     sprites.destroy(otherSprite)
+})
+scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles14, function (sprite, location) {
+    tiles.placeOnTile(sprite, tiles.getTileLocation(location.column, location.row - 2))
+    setupLevel1()
 })
 function setupLevel2 () {
     sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
@@ -636,6 +657,30 @@ function setupLevel1 () {
         . f 6 1 1 1 1 1 1 6 6 6 f . . . 
         . . c c c c c c c c c f . . . . 
         `, SpriteKind.Enemy))
+}
+function setupLevel3 () {
+    sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
+    tiles.setCurrentTilemap(tilemap`level14`)
+    levelState = 3
+    mySprite = sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . 4 4 4 4 . . . . . . 
+        . . . . 4 4 4 5 5 4 4 4 . . . . 
+        . . . 3 3 3 3 4 4 4 4 4 4 . . . 
+        . . 4 3 3 3 3 2 2 2 1 1 4 4 . . 
+        . . 3 3 3 3 3 2 2 2 1 1 5 4 . . 
+        . 4 3 3 3 3 2 2 2 2 2 5 5 4 4 . 
+        . 4 3 3 3 2 2 2 4 4 4 4 5 4 4 . 
+        . 4 4 3 3 2 2 4 4 4 4 4 4 4 4 . 
+        . 4 2 3 3 2 2 4 4 4 4 4 4 4 4 . 
+        . . 4 2 3 3 2 4 4 4 4 4 2 4 . . 
+        . . 4 2 2 3 2 2 4 4 4 2 4 4 . . 
+        . . . 4 2 2 2 2 2 2 2 2 4 . . . 
+        . . . . 4 4 2 2 2 2 4 4 . . . . 
+        . . . . . . 4 4 4 4 . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.Ball)
+    tiles.placeOnTile(mySprite, tiles.getTileLocation(4, 12))
 }
 function doAttack () {
     if (heroFacingPosition == 0) {
@@ -1071,9 +1116,18 @@ function doAttack () {
         isHit(value)
     }
 }
-let levelState = 0
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.collectibleInsignia, function (sprite, location) {
+    tiles.placeOnTile(sprite, tiles.getTileLocation(location.column, location.row + 2))
+    setupLevel0()
+})
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.stairSouth, function (sprite, location) {
+    tiles.placeOnTile(sprite, tiles.getTileLocation(location.column, location.row - 2))
+    setupLevel2()
+})
+let mySprite: Sprite = null
 let ghost: Sprite = null
 let bat: Sprite = null
+let levelState = 0
 let isBothBottom = 0
 let isBothTop = 0
 let isBothRight = 0
@@ -1086,7 +1140,7 @@ let marginOfError = 0
 let heroFacingPosition = 0
 let dude: Sprite = null
 let heart: Sprite = null
-setupLevel1()
-setupDude(1, 6)
+setupLevel0()
+setupDude(7, 6)
 setHeart(4, 2)
 info.setLife(3)
