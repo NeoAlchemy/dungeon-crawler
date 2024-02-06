@@ -201,12 +201,8 @@ function isHit (enemySprite: Sprite) {
     isEnemyBelow = 0
     isEnemyLeft = 0
     isEnemyRight = 0
-    console.log("")
-    console.log("-----------")
-    console.logValue("dude top", dude.top)
-    console.logValue("dude right", dude.right)
-    console.logValue("enemy bottom", enemySprite.bottom)
-    console.logValue("enemy left", enemySprite.left)
+    isBothLeft = 0
+    isBothRight = 0
     if (dude.top >= enemySprite.bottom - marginOfError && dude.top <= enemySprite.bottom + marginOfError) {
         isEnemyAbove = 1
     }
@@ -219,18 +215,26 @@ function isHit (enemySprite: Sprite) {
     if (dude.right >= enemySprite.left - marginOfError && dude.right <= enemySprite.left + marginOfError) {
         isEnemyRight = 1
     }
+    if (dude.left >= enemySprite.left - marginOfError && dude.left <= enemySprite.bottom + marginOfError) {
+        isBothLeft = 1
+    }
+    if (dude.right >= enemySprite.right - marginOfError && dude.right <= enemySprite.bottom + marginOfError) {
+        isBothRight = 1
+    }
     console.log("-----------")
     console.logValue("top", isEnemyAbove)
     console.logValue("bottom", isEnemyBelow)
     console.logValue("left", isEnemyLeft)
     console.logValue("right", isEnemyRight)
+    console.logValue("bothLeft", isBothLeft)
+    console.logValue("bothRight", isBothRight)
     if (heroFacingPosition == 0) {
-        if (isEnemyAbove == 1 && (isEnemyRight == 1 || isEnemyLeft == 1)) {
+        if (isEnemyAbove == 1 && (isBothRight == 1 || isBothLeft == 1)) {
             sprites.destroy(enemySprite, effects.fire, 100)
             info.changeScoreBy(100)
         }
     } else if (heroFacingPosition == 1) {
-        if (isEnemyBelow == 1 && (isEnemyRight == 1 || isEnemyLeft == 1)) {
+        if (isEnemyBelow == 1 && (isBothRight == 1 || isBothLeft == 1)) {
             sprites.destroy(enemySprite, effects.fire, 100)
             info.changeScoreBy(100)
         }
@@ -1060,6 +1064,8 @@ function doAttack () {
 let levelState = 0
 let ghost: Sprite = null
 let bat: Sprite = null
+let isBothRight = 0
+let isBothLeft = 0
 let isEnemyRight = 0
 let isEnemyLeft = 0
 let isEnemyBelow = 0
