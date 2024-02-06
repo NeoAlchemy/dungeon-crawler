@@ -196,13 +196,15 @@ function doWalkBackwards () {
     heroFacingPosition = 1
 }
 function isHit (enemySprite: Sprite) {
-    marginOfError = 10
+    marginOfError = 7
     isEnemyAbove = 0
     isEnemyBelow = 0
     isEnemyLeft = 0
     isEnemyRight = 0
     isBothLeft = 0
     isBothRight = 0
+    isBothTop = 0
+    isBothBottom = 0
     if (dude.top >= enemySprite.bottom - marginOfError && dude.top <= enemySprite.bottom + marginOfError) {
         isEnemyAbove = 1
     }
@@ -215,11 +217,17 @@ function isHit (enemySprite: Sprite) {
     if (dude.right >= enemySprite.left - marginOfError && dude.right <= enemySprite.left + marginOfError) {
         isEnemyRight = 1
     }
-    if (dude.left >= enemySprite.left - marginOfError && dude.left <= enemySprite.bottom + marginOfError) {
+    if (dude.left >= enemySprite.left - marginOfError && dude.left <= enemySprite.left + marginOfError) {
         isBothLeft = 1
     }
-    if (dude.right >= enemySprite.right - marginOfError && dude.right <= enemySprite.bottom + marginOfError) {
+    if (dude.right >= enemySprite.right - marginOfError && dude.right <= enemySprite.right + marginOfError) {
         isBothRight = 1
+    }
+    if (dude.top >= enemySprite.top - marginOfError && dude.top <= enemySprite.top + marginOfError) {
+        isBothTop = 1
+    }
+    if (dude.bottom >= enemySprite.bottom - marginOfError && dude.bottom <= enemySprite.bottom + marginOfError) {
+        isBothBottom = 1
     }
     console.log("-----------")
     console.logValue("top", isEnemyAbove)
@@ -228,23 +236,25 @@ function isHit (enemySprite: Sprite) {
     console.logValue("right", isEnemyRight)
     console.logValue("bothLeft", isBothLeft)
     console.logValue("bothRight", isBothRight)
+    console.logValue("bothTop", isBothTop)
+    console.logValue("bothBottom", isBothBottom)
     if (heroFacingPosition == 0) {
-        if (isEnemyAbove == 1 && (isBothRight == 1 || isBothLeft == 1)) {
+        if (isEnemyAbove == 1 && (isBothRight || isBothLeft)) {
             sprites.destroy(enemySprite, effects.fire, 100)
             info.changeScoreBy(100)
         }
     } else if (heroFacingPosition == 1) {
-        if (isEnemyBelow == 1 && (isBothRight == 1 || isBothLeft == 1)) {
+        if (isEnemyBelow == 1 && (isBothRight || isBothLeft)) {
             sprites.destroy(enemySprite, effects.fire, 100)
             info.changeScoreBy(100)
         }
     } else if (heroFacingPosition == 2) {
-        if (isEnemyLeft && (!(isEnemyBelow) && !(isEnemyAbove))) {
+        if (isEnemyLeft && (isBothBottom || isBothTop)) {
             sprites.destroy(enemySprite, effects.fire, 100)
             info.changeScoreBy(100)
         }
     } else {
-        if (isEnemyRight && (!(isEnemyBelow) && !(isEnemyAbove))) {
+        if (isEnemyRight && (isBothBottom || isBothTop)) {
             sprites.destroy(enemySprite, effects.fire, 100)
             info.changeScoreBy(100)
         }
@@ -1064,6 +1074,8 @@ function doAttack () {
 let levelState = 0
 let ghost: Sprite = null
 let bat: Sprite = null
+let isBothBottom = 0
+let isBothTop = 0
 let isBothRight = 0
 let isBothLeft = 0
 let isEnemyRight = 0
